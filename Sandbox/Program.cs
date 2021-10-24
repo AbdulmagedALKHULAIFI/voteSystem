@@ -17,6 +17,7 @@ namespace Sandbox
         public double getPercent(int total){
             return Math.Round(count * 100.0 /total, 2);
         }
+
     }
 
 
@@ -30,13 +31,28 @@ namespace Sandbox
         }
 
         public int Total() => counters.Sum(x => x.count);
-        
+
+        public void AnounceWinner()
+        {
+            var biggestAmountOfVotes = counters.Max(x => x.count);
+
+            var winners = counters.Where(x => x.count == biggestAmountOfVotes).ToList();
+
+            if (winners.Count == 1)
+            {
+                var winner = winners.First();
+                Console.WriteLine($"{winner.name} won !");
+            }
+            else 
+                string.Join("-Draw- ", winners.Select(x => x.name));
+        }
+
     }
     class Program
     {
         static void Main(string[] args)
         {
-            var yes = new Counter("yes",1);
+            var yes = new Counter("yes",2);
             var no = new Counter("no",2);
 
             var manager = new CounterManager(yes, no);
@@ -45,19 +61,10 @@ namespace Sandbox
             var noPercent = no.getPercent(manager.Total());
 
 
-            Console.WriteLine($"Yes counts : {yes.count}, percentage: {yesPercent}%");
-            Console.WriteLine($"No counts : {no.count}, percentage: {noPercent}%");
+            foreach(var c in manager.counters)
+                Console.WriteLine($"{c.name} counts : {c.count}, percentage: {c.getPercent(manager.Total())}%");
 
-            if (no.count > yes.count)
-                Console.WriteLine("No won");
-            else if(yes.count > no.count)
-            {
-                Console.WriteLine("Yes Won");
-
-            }
-            else
-                Console.WriteLine("Draw");
-
+            manager.AnounceWinner();
 
         }
     }
